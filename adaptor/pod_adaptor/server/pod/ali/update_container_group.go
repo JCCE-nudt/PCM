@@ -16,18 +16,56 @@
 package ali
 
 import (
+	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/common/tenanter"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/responses"
 )
+
+// UpdateContainerGroup invokes the eci.UpdateContainerGroup API synchronously
+// api document: https://help.aliyun.com/api/eci/updatecontainergroup.html
+func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *UpdateContainerGroupResponse, err error) {
+
+	provider := pbtenant.CloudProvider(request.ProviderId)
+	regionId, err := tenanter.GetAliRegionId(request.RegionId)
+	containers := *request.Container
+
+	requestPCM := &pbpod.UpdatePodReq{
+		Provider:       provider,
+		AccountName:    request.AccountName,
+		PodId:          request.ContainerGroupId,
+		PodName:        request.ContainerGroupName,
+		Namespace:      request.Namespace,
+		RegionId:       regionId,
+		ContainerImage: containers[0].Image,
+		ContainerName:  containers[0].Name,
+		CpuPod:         string(containers[0].Cpu),
+		MemoryPod:      string(containers[0].Memory),
+		RestartPolicy:  request.RestartPolicy,
+		Labels:         "",
+	}
+
+	resp, err := pod.UpdatePod(nil, requestPCM)
+
+	response = &UpdateContainerGroupResponse{
+		BaseResponse: nil,
+		RequestId:    resp.RequestId,
+	}
+
+	return response, err
+}
 
 // UpdateContainerGroupRequest is the request struct for api UpdateContainerGroup
 type UpdateContainerGroupRequest struct {
 	*requests.RpcRequest
 	/*********PCM param************/
-	ProviderId         int32  `position:"Query" name:"ProviderId"`
-	AccountName        string `position:"Query" name:"AccountName"`
-	Namespace          string `position:"Query" name:"Namespace"`
-	ContainerGroupName string `position:"Query" name:"ContainerGroupName"`
+	Tenanters          []tenanter.Tenanter `position:"Query" name:"Tenanters"`
+	ProviderId         int32               `position:"Query" name:"ProviderId"`
+	AccountName        string              `position:"Query" name:"AccountName"`
+	Namespace          string              `position:"Query" name:"Namespace"`
+	ContainerGroupName string              `position:"Query" name:"ContainerGroupName"`
 	/*********PCM param************/
 	OwnerId                 requests.Integer                               `position:"Query" name:"OwnerId"`
 	ResourceOwnerAccount    string                                         `position:"Query" name:"ResourceOwnerAccount"`

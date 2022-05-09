@@ -202,8 +202,10 @@ message ListPodDetailResp {
 message ListPodReq {
   // cloud name
   pbtenant.CloudProvider provider = 1;
-  //
+  //命名空间
   string namespace =2;
+  //请求源,如果是从ali sdk 过来的，则单独生成tenanters实体
+  string requestSource =3;
 }
 
 message ListPodResp {

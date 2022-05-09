@@ -2,8 +2,8 @@ package pod
 
 import (
 	"context"
+	"flag"
 	"fmt"
-	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod/ali"
 	"sync"
 
 	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/service"
@@ -203,155 +203,34 @@ func ListPodDetail(ctx context.Context, req *pbpod.ListPodDetailReq) (*pbpod.Lis
 	return pod.ListPodDetail(ctx, req)
 }
 
-// CreateContainerGroup invokes the eci.CreateContainerGroup API synchronously
-// api document: https://help.aliyun.com/api/eci/createcontainergroup.html
-func CreateContainerGroup(request *ali.CreateContainerGroupRequest) (response *ali.CreateContainerGroupResponse, err error) {
-
-	provider := pbtenant.CloudProvider(request.ProviderId)
-	tenanters, err := tenanter.GetTenanters(provider)
-	regionId, err := tenanter.GetAliRegionId(request.RegionId)
-	container := *request.Container
-	containerImage := container[0].Image
-	containerName := container[0].Name
-	containerPod := container[0].Cpu
-	memoryPod := container[0].Memory
-
-	requestPCM := &pbpod.CreatePodReq{
-		Provider:        provider,
-		AccountName:     tenanters[0].AccountName(),
-		PodName:         request.ContainerGroupName,
-		RegionId:        regionId,
-		ContainerImage:  containerImage,
-		ContainerName:   containerName,
-		CpuPod:          string(containerPod),
-		MemoryPod:       string(memoryPod),
-		SecurityGroupId: "sg-6qlun7hd",
-		SubnetId:        "subnet-mnwfg2fk",
-		VpcId:           "vpc-rkwt40g5",
-		Namespace:       "pcm",
-	}
-
-	resp, err := CreatePod(nil, requestPCM)
-
-	response = &ali.CreateContainerGroupResponse{
-		BaseResponse:     nil,
-		RequestId:        resp.RequestId,
-		ContainerGroupId: resp.PodId,
-	}
-
-	return response, nil
-}
-
-// DeleteContainerGroup invokes the eci.DeleteContainerGroup API synchronously
-// api document: https://help.aliyun.com/api/eci/deletecontainergroup.html
-func DeleteContainerGroup(request *ali.DeleteContainerGroupRequest) (response *ali.DeleteContainerGroupResponse, err error) {
-
-	provider := pbtenant.CloudProvider(request.ProviderId)
-	regionId, err := tenanter.GetAliRegionId(request.RegionId)
-	podId := request.ContainerGroupId
-	podName := request.ContainerGroupName
-
-	requestPCM := &pbpod.DeletePodReq{
-		Provider:    provider,
-		AccountName: request.AccountName,
-		PodId:       podId,
-		PodName:     podName,
-		Namespace:   request.Namespace,
-		RegionId:    regionId,
-	}
-
-	resp, err := DeletePod(nil, requestPCM)
-
-	response = &ali.DeleteContainerGroupResponse{
-		BaseResponse: nil,
-		RequestId:    resp.RequestId,
-	}
-
-	return response, err
-
-}
-
-// DescribeContainerGroups invokes the eci.DescribeContainerGroups API synchronously
-// api document: https://help.aliyun.com/api/eci/describecontainergroups.html
-func DescribeContainerGroups(request *ali.DescribeContainerGroupsRequest) (response *ali.DescribeContainerGroupsResponse, err error) {
-
-	provider := pbtenant.CloudProvider(request.ProviderId)
-	containerGroups := make([]ali.DescribeContainerGroupsContainerGroup0, 0)
-	requestPCM := &pbpod.ListPodReq{
-		Provider:  provider,
-		Namespace: "pcm",
-	}
-
-	resp, err := ListPod(nil, requestPCM)
-
-	//trans PCM response pod set to Ali ContainerGroup set
-	for k := range resp.Pods {
-		podId := resp.Pods[k].PodId
-		podName := resp.Pods[k].PodName
-
-		containerGroup := new(ali.DescribeContainerGroupsContainerGroup0)
-		containerGroup.ContainerGroupName = podName
-		containerGroup.ContainerGroupId = podId
-
-		containerGroups = append(containerGroups, *containerGroup)
-
-	}
-
-	response = &ali.DescribeContainerGroupsResponse{
-		BaseResponse:    nil,
-		RequestId:       "",
-		NextToken:       "",
-		TotalCount:      0,
-		ContainerGroups: containerGroups,
-	}
-
-	return response, nil
-}
-
-// UpdateContainerGroup invokes the eci.UpdateContainerGroup API synchronously
-// api document: https://help.aliyun.com/api/eci/updatecontainergroup.html
-func UpdateContainerGroup(request *ali.UpdateContainerGroupRequest) (response *ali.UpdateContainerGroupResponse, err error) {
-
-	provider := pbtenant.CloudProvider(request.ProviderId)
-	regionId, err := tenanter.GetAliRegionId(request.RegionId)
-	containers := *request.Container
-
-	requestPCM := &pbpod.UpdatePodReq{
-		Provider:       provider,
-		AccountName:    request.AccountName,
-		PodId:          request.ContainerGroupId,
-		PodName:        request.ContainerGroupName,
-		Namespace:      request.Namespace,
-		RegionId:       regionId,
-		ContainerImage: containers[0].Image,
-		ContainerName:  containers[0].Name,
-		CpuPod:         string(containers[0].Cpu),
-		MemoryPod:      string(containers[0].Memory),
-		RestartPolicy:  request.RestartPolicy,
-		Labels:         "",
-	}
-
-	resp, err := UpdatePod(nil, requestPCM)
-
-	response = &ali.UpdateContainerGroupResponse{
-		BaseResponse: nil,
-		RequestId:    resp.RequestId,
-	}
-
-	return response, err
-}
-
 func ListPod(ctx context.Context, req *pbpod.ListPodReq) (*pbpod.ListPodResp, error) {
 	var (
-		wg    sync.WaitGroup
-		mutex sync.Mutex
-		pods  []*pbpod.PodInstance
+		wg        sync.WaitGroup
+		mutex     sync.Mutex
+		pods      []*pbpod.PodInstance
+		tenanters []tenanter.Tenanter
 	)
+	//ali adk过来的请求需要从用户本地读取配置文件
+	if req.RequestSource == "ali" {
 
-	tenanters, err := tenanter.GetTenanters(req.Provider)
-	if err != nil {
-		return nil, errors.WithMessage(err, "getTenanters error")
+		var configFile string
+		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
+		flag.Parse()
+		defer glog.Flush()
+
+		if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
+			if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
+				glog.Fatalf("LoadCloudConfigsFromFile error %+v", err)
+			}
+			glog.Warningf("LoadCloudConfigsFromFile empty file path %s", configFile)
+		}
+
+		glog.Infof("load tenant from file finished")
+		tenanters, _ = tenanter.GetTenanters(req.Provider)
+	} else {
+		tenanters, _ = tenanter.GetTenanters(req.Provider)
 	}
+
 	//get the available region for product
 	reqPodRegion := &pbpod.GetPodRegionReq{Provider: req.GetProvider()}
 	respPodRegion, err := GetPodRegion(ctx, reqPodRegion)

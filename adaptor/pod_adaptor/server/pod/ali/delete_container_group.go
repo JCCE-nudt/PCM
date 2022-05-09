@@ -16,18 +16,52 @@
 package ali
 
 import (
+	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/common/tenanter"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/responses"
 )
+
+// DeleteContainerGroup invokes the eci.DeleteContainerGroup API synchronously
+// api document: https://help.aliyun.com/api/eci/deletecontainergroup.html
+func DeleteContainerGroup(request *DeleteContainerGroupRequest) (response *DeleteContainerGroupResponse, err error) {
+
+	provider := pbtenant.CloudProvider(request.ProviderId)
+	regionId, err := tenanter.GetAliRegionId(request.RegionId)
+	podId := request.ContainerGroupId
+	podName := request.ContainerGroupName
+
+	requestPCM := &pbpod.DeletePodReq{
+		Provider:    provider,
+		AccountName: request.AccountName,
+		PodId:       podId,
+		PodName:     podName,
+		Namespace:   request.Namespace,
+		RegionId:    regionId,
+	}
+
+	resp, err := pod.DeletePod(nil, requestPCM)
+
+	response = &DeleteContainerGroupResponse{
+		BaseResponse: nil,
+		RequestId:    resp.RequestId,
+	}
+
+	return response, err
+
+}
 
 // DeleteContainerGroupRequest is the request struct for api DeleteContainerGroup
 type DeleteContainerGroupRequest struct {
 	*requests.RpcRequest
 	/*********PCM param************/
-	ProviderId         int32  `position:"Query" name:"ProviderId"`
-	AccountName        string `position:"Query" name:"AccountName"`
-	Namespace          string `position:"Query" name:"Namespace"`
-	ContainerGroupName string `position:"Query" name:"ContainerGroupName"`
+	Tenanters          []tenanter.Tenanter `position:"Query" name:"Tenanters"`
+	ProviderId         int32               `position:"Query" name:"ProviderId"`
+	AccountName        string              `position:"Query" name:"AccountName"`
+	Namespace          string              `position:"Query" name:"Namespace"`
+	ContainerGroupName string              `position:"Query" name:"ContainerGroupName"`
 	/*********PCM param************/
 	OwnerId              requests.Integer `position:"Query" name:"OwnerId"`
 	ResourceOwnerAccount string           `position:"Query" name:"ResourceOwnerAccount"`

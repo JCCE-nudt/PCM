@@ -52,6 +52,14 @@
           },
           {
             "name": "namespace",
+            "description": "命名空间",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "requestSource",
+            "description": "请求源,如果是从ali sdk 过来的，则单独生成tenanters实体",
             "in": "query",
             "required": false,
             "type": "string"

@@ -1,17 +1,61 @@
 package ali
 
 import (
+	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/common/tenanter"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
+	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/responses"
 )
+
+// CreateContainerGroup invokes the eci.CreateContainerGroup API synchronously
+// api document: https://help.aliyun.com/api/eci/createcontainergroup.html
+func CreateContainerGroup(request *CreateContainerGroupRequest) (response *CreateContainerGroupResponse, err error) {
+
+	provider := pbtenant.CloudProvider(request.ProviderId)
+	tenanters, err := tenanter.GetTenanters(provider)
+	regionId, err := tenanter.GetAliRegionId(request.RegionId)
+	container := *request.Container
+	containerImage := container[0].Image
+	containerName := container[0].Name
+	containerPod := container[0].Cpu
+	memoryPod := container[0].Memory
+
+	requestPCM := &pbpod.CreatePodReq{
+		Provider:        provider,
+		AccountName:     tenanters[0].AccountName(),
+		PodName:         request.ContainerGroupName,
+		RegionId:        regionId,
+		ContainerImage:  containerImage,
+		ContainerName:   containerName,
+		CpuPod:          string(containerPod),
+		MemoryPod:       string(memoryPod),
+		SecurityGroupId: "sg-6qlun7hd",
+		SubnetId:        "subnet-mnwfg2fk",
+		VpcId:           "vpc-rkwt40g5",
+		Namespace:       "pcm",
+	}
+
+	resp, err := pod.CreatePod(nil, requestPCM)
+
+	response = &CreateContainerGroupResponse{
+		BaseResponse:     nil,
+		RequestId:        resp.RequestId,
+		ContainerGroupId: resp.PodId,
+	}
+
+	return response, nil
+}
 
 // CreateContainerGroupRequest is the request struct for api CreateContainerGroup
 type CreateContainerGroupRequest struct {
 	*requests.RpcRequest
 	/*********PCM param************/
-	ProviderId  int32  `position:"Query" name:"ProviderId"`
-	AccountName string `position:"Query" name:"AccountName"`
-	Namespace   string `position:"Query" name:"Namespace"`
+	Tenanters   []tenanter.Tenanter `position:"Query" name:"Tenanters"`
+	ProviderId  int32               `position:"Query" name:"ProviderId"`
+	AccountName string              `position:"Query" name:"AccountName"`
+	Namespace   string              `position:"Query" name:"Namespace"`
 	/*********PCM param************/
 	OwnerId                       requests.Integer                               `position:"Query" name:"OwnerId"`
 	ResourceOwnerAccount          string                                         `position:"Query" name:"ResourceOwnerAccount"`
