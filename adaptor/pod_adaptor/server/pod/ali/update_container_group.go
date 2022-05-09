@@ -33,6 +33,7 @@ func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *Updat
 	containers := *request.Container
 
 	requestPCM := &pbpod.UpdatePodReq{
+		RequestSource:  "ali",
 		Provider:       provider,
 		AccountName:    request.AccountName,
 		PodId:          request.ContainerGroupId,

@@ -34,12 +34,13 @@ func DeleteContainerGroup(request *DeleteContainerGroupRequest) (response *Delet
 	podName := request.ContainerGroupName
 
 	requestPCM := &pbpod.DeletePodReq{
-		Provider:    provider,
-		AccountName: request.AccountName,
-		PodId:       podId,
-		PodName:     podName,
-		Namespace:   request.Namespace,
-		RegionId:    regionId,
+		RequestSource: "ali",
+		Provider:      provider,
+		AccountName:   request.AccountName,
+		PodId:         podId,
+		PodName:       podName,
+		Namespace:     request.Namespace,
+		RegionId:      regionId,
 	}
 
 	resp, err := pod.DeletePod(nil, requestPCM)

@@ -2,7 +2,9 @@ package tenanter
 
 import (
 	"encoding/json"
+	"flag"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
+	"github.com/golang/glog"
 	"io/ioutil"
 	"os"
 	"sync"
@@ -98,4 +100,20 @@ func GetTenanters(provider pbtenant.CloudProvider) ([]Tenanter, error) {
 		tenanters[k] = gStore.stores[provider][k].Clone()
 	}
 	return tenanters, nil
+}
+
+func GenTenanter(configPath string) {
+	var configFile string
+	flag.StringVar(&configFile, "conf", configPath, "config.yaml")
+	flag.Parse()
+	defer glog.Flush()
+
+	if err := LoadCloudConfigsFromFile(configFile); err != nil {
+		if !errors.Is(err, ErrLoadTenanterFileEmpty) {
+			glog.Fatalf("LoadCloudConfigsFromFile error %+v", err)
+		}
+		glog.Warningf("LoadCloudConfigsFromFile empty file path %s", configFile)
+	}
+
+	glog.Infof("load tenant from file finished")
 }

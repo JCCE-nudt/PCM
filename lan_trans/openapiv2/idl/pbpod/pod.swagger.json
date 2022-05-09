@@ -59,7 +59,7 @@
           },
           {
             "name": "requestSource",
-            "description": "请求源,如果是从ali sdk 过来的，则单独生成tenanters实体",
+            "description": "请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体",
             "in": "query",
             "required": false,
             "type": "string"
@@ -383,6 +383,10 @@
         "namespace": {
           "type": "string",
           "title": "名空间"
+        },
+        "requestSource": {
+          "type": "string",
+          "title": "请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体"
         }
       }
     },
@@ -466,6 +470,10 @@
           "type": "integer",
           "format": "int32",
           "title": "地域，数据中心"
+        },
+        "requestSource": {
+          "type": "string",
+          "title": "请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体"
         }
       }
     },
@@ -661,6 +669,10 @@
         "labels": {
           "type": "string",
           "title": "labels"
+        },
+        "requestSource": {
+          "type": "string",
+          "title": "请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体"
         }
       }
     },

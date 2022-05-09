@@ -81,6 +81,8 @@ message CreatePodReq {
   string vpc_id = 12;
   //名空间
   string namespace = 13;
+  //请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体
+  string requestSource = 14;
 }
 
 message CreatePodResp {
@@ -109,6 +111,8 @@ message DeletePodReq {
   string namespace = 6;
   // 地域，数据中心
   int32 region_id = 7;
+  //请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体
+  string requestSource = 8;
 }
 
 message DeletePodResp {
@@ -149,6 +153,8 @@ message UpdatePodReq {
   string restart_policy = 12;
   // labels
   string labels = 13;
+  //请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体
+  string requestSource = 14;
 }
 
 message UpdatePodResp {
@@ -204,7 +210,7 @@ message ListPodReq {
   pbtenant.CloudProvider provider = 1;
   //命名空间
   string namespace =2;
-  //请求源,如果是从ali sdk 过来的，则单独生成tenanters实体
+  //请求源,如果是从pcm sdk 过来的，则单独生成tenanters实体
   string requestSource =3;
 }
 

@@ -23,6 +23,7 @@ func CreateContainerGroup(request *CreateContainerGroupRequest) (response *Creat
 	memoryPod := container[0].Memory
 
 	requestPCM := &pbpod.CreatePodReq{
+		RequestSource:   "ali",
 		Provider:        provider,
 		AccountName:     tenanters[0].AccountName(),
 		PodName:         request.ContainerGroupName,

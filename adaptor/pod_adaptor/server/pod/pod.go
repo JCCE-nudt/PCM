@@ -2,7 +2,6 @@ package pod
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"sync"
 
@@ -99,7 +98,10 @@ func CreatePod(ctx context.Context, req *pbpod.CreatePodReq) (*pbpod.CreatePodRe
 	var (
 		pod poder.Poder
 	)
-
+	//pcm adk过来的请求需要从用户本地读取配置文件
+	if len(req.RequestSource) > 0 {
+		tenanter.GenTenanter("configs/config.yaml")
+	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
 		return nil, errors.WithMessage(err, "getTenanters error")
@@ -126,7 +128,10 @@ func DeletePod(ctx context.Context, req *pbpod.DeletePodReq) (*pbpod.DeletePodRe
 	var (
 		pod poder.Poder
 	)
-
+	//pcm adk过来的请求需要从用户本地读取配置文件
+	if len(req.RequestSource) > 0 {
+		tenanter.GenTenanter("configs/config.yaml")
+	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
 		return nil, errors.WithMessage(err, "getTenanters error")
@@ -153,7 +158,10 @@ func UpdatePod(ctx context.Context, req *pbpod.UpdatePodReq) (*pbpod.UpdatePodRe
 	var (
 		pod poder.Poder
 	)
-
+	//pcm adk过来的请求需要从用户本地读取配置文件
+	if len(req.RequestSource) > 0 {
+		tenanter.GenTenanter("configs/config.yaml")
+	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
 		return nil, errors.WithMessage(err, "getTenanters error")
@@ -210,26 +218,12 @@ func ListPod(ctx context.Context, req *pbpod.ListPodReq) (*pbpod.ListPodResp, er
 		pods      []*pbpod.PodInstance
 		tenanters []tenanter.Tenanter
 	)
-	//ali adk过来的请求需要从用户本地读取配置文件
-	if req.RequestSource == "ali" {
-
-		var configFile string
-		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
-		flag.Parse()
-		defer glog.Flush()
-
-		if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
-			if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
-				glog.Fatalf("LoadCloudConfigsFromFile error %+v", err)
-			}
-			glog.Warningf("LoadCloudConfigsFromFile empty file path %s", configFile)
-		}
-
-		glog.Infof("load tenant from file finished")
-		tenanters, _ = tenanter.GetTenanters(req.Provider)
-	} else {
-		tenanters, _ = tenanter.GetTenanters(req.Provider)
+	//pcm adk过来的请求需要从用户本地读取配置文件
+	if len(req.RequestSource) > 0 {
+		tenanter.GenTenanter("configs/config.yaml")
 	}
+
+	tenanters, _ = tenanter.GetTenanters(req.Provider)
 
 	//get the available region for product
 	reqPodRegion := &pbpod.GetPodRegionReq{Provider: req.GetProvider()}
