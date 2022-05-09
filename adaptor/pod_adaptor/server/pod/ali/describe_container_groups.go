@@ -17,7 +17,6 @@ package ali
 
 import (
 	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
-	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
@@ -66,10 +65,10 @@ func DescribeContainerGroups(request *DescribeContainerGroupsRequest) (response 
 type DescribeContainerGroupsRequest struct {
 	*requests.RpcRequest
 	/*********PCM param************/
-	Tenanters   []tenanter.Tenanter `position:"Query" name:"Tenanters"`
-	ProviderId  int32               `position:"Query" name:"ProviderId"`
-	AccountName string              `position:"Query" name:"AccountName"`
-	Namespace   string              `position:"Query" name:"Namespace"`
+	RequestSource string `position:"Query" name:"RequestSource"`
+	ProviderId    int32  `position:"Query" name:"ProviderId"`
+	AccountName   string `position:"Query" name:"AccountName"`
+	Namespace     string `position:"Query" name:"Namespace"`
 	/*********PCM param************/
 	OwnerId              requests.Integer              `position:"Query" name:"OwnerId"`
 	ResourceOwnerAccount string                        `position:"Query" name:"ResourceOwnerAccount"`

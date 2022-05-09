@@ -57,11 +57,11 @@ func DeleteContainerGroup(request *DeleteContainerGroupRequest) (response *Delet
 type DeleteContainerGroupRequest struct {
 	*requests.RpcRequest
 	/*********PCM param************/
-	Tenanters          []tenanter.Tenanter `position:"Query" name:"Tenanters"`
-	ProviderId         int32               `position:"Query" name:"ProviderId"`
-	AccountName        string              `position:"Query" name:"AccountName"`
-	Namespace          string              `position:"Query" name:"Namespace"`
-	ContainerGroupName string              `position:"Query" name:"ContainerGroupName"`
+	RequestSource      string `position:"Query" name:"RequestSource"`
+	ProviderId         int32  `position:"Query" name:"ProviderId"`
+	AccountName        string `position:"Query" name:"AccountName"`
+	Namespace          string `position:"Query" name:"Namespace"`
+	ContainerGroupName string `position:"Query" name:"ContainerGroupName"`
 	/*********PCM param************/
 	OwnerId              requests.Integer `position:"Query" name:"OwnerId"`
 	ResourceOwnerAccount string           `position:"Query" name:"ResourceOwnerAccount"`
