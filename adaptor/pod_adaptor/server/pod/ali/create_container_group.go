@@ -14,6 +14,7 @@ import (
 func CreateContainerGroup(request *CreateContainerGroupRequest) (response *CreateContainerGroupResponse, err error) {
 
 	provider := pbtenant.CloudProvider(request.ProviderId)
+	tenanter.GenTenanter("configs/config.yaml")
 	tenanters, err := tenanter.GetTenanters(provider)
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	container := *request.Container

@@ -29,6 +29,7 @@ import (
 func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *UpdateContainerGroupResponse, err error) {
 
 	provider := pbtenant.CloudProvider(request.ProviderId)
+	tenanter.GenTenanter("configs/config.yaml")
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	containers := *request.Container
 

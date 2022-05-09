@@ -29,6 +29,7 @@ import (
 func DeleteContainerGroup(request *DeleteContainerGroupRequest) (response *DeleteContainerGroupResponse, err error) {
 
 	provider := pbtenant.CloudProvider(request.ProviderId)
+	tenanter.GenTenanter("configs/config.yaml")
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	podId := request.ContainerGroupId
 	podName := request.ContainerGroupName
