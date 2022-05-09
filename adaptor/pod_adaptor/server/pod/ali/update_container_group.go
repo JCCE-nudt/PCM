@@ -16,6 +16,7 @@
 package ali
 
 import (
+	"flag"
 	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
@@ -29,7 +30,10 @@ import (
 func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *UpdateContainerGroupResponse, err error) {
 
 	provider := pbtenant.CloudProvider(request.ProviderId)
-	tenanter.GenTenanter("configs/config.yaml")
+	var configFile string
+	flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
+	flag.Parse()
+	tenanter.LoadCloudConfigsFromFile(configFile)
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	containers := *request.Container
 

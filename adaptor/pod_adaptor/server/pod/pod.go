@@ -2,6 +2,7 @@ package pod
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"sync"
 
@@ -100,7 +101,10 @@ func CreatePod(ctx context.Context, req *pbpod.CreatePodReq) (*pbpod.CreatePodRe
 	)
 	//pcm adk过来的请求需要从用户本地读取配置文件
 	if len(req.RequestSource) > 0 {
-		tenanter.GenTenanter("configs/config.yaml")
+		var configFile string
+		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
+		flag.Parse()
+		tenanter.LoadCloudConfigsFromFile(configFile)
 	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
@@ -130,7 +134,10 @@ func DeletePod(ctx context.Context, req *pbpod.DeletePodReq) (*pbpod.DeletePodRe
 	)
 	//pcm adk过来的请求需要从用户本地读取配置文件
 	if len(req.RequestSource) > 0 {
-		tenanter.GenTenanter("configs/config.yaml")
+		var configFile string
+		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
+		flag.Parse()
+		tenanter.LoadCloudConfigsFromFile(configFile)
 	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
@@ -220,7 +227,10 @@ func ListPod(ctx context.Context, req *pbpod.ListPodReq) (*pbpod.ListPodResp, er
 	)
 	//pcm adk过来的请求需要从用户本地读取配置文件
 	if len(req.RequestSource) > 0 {
-		tenanter.GenTenanter("configs/config.yaml")
+		var configFile string
+		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
+		flag.Parse()
+		tenanter.LoadCloudConfigsFromFile(configFile)
 	}
 
 	tenanters, _ = tenanter.GetTenanters(req.Provider)
