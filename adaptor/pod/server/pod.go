@@ -1,4 +1,4 @@
-package pod
+package server
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/service"
+	"github.com/JCCE-nudt/PCM/adaptor/pod/service"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"

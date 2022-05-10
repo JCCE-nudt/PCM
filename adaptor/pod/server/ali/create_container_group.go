@@ -3,7 +3,7 @@ package ali
 import (
 	"errors"
 	"flag"
-	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/adaptor/pod/server"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
@@ -64,7 +64,7 @@ func CreateContainerGroup(request *CreateContainerGroupRequest) (response *Creat
 		Namespace:       "pcm",
 	}
 
-	resp, err := pod.CreatePod(nil, requestPCM)
+	resp, err := server.CreatePod(nil, requestPCM)
 
 	response = &CreateContainerGroupResponse{
 		BaseResponse:     nil,

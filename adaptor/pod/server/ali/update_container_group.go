@@ -18,7 +18,7 @@ package ali
 import (
 	"errors"
 	"flag"
-	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/adaptor/pod/server"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
@@ -45,7 +45,17 @@ func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *Updat
 	}
 
 	glog.Infof("load tenant from file finished")
-	regionId, err := tenanter.GetAliRegionId(request.RegionId)
+	var regionId int32
+	switch request.ProviderId {
+	case 0:
+		regionId, _ = tenanter.GetAliRegionId(request.RegionId)
+	case 1:
+		regionId, _ = tenanter.GetTencentRegionId(request.RegionId)
+	case 2:
+		regionId, _ = tenanter.GetHuaweiRegionId(request.RegionId)
+	case 3:
+		regionId, _ = tenanter.GetK8SRegionId(request.RegionId)
+	}
 	containers := *request.Container
 
 	requestPCM := &pbpod.UpdatePodReq{
@@ -64,7 +74,7 @@ func UpdateContainerGroup(request *UpdateContainerGroupRequest) (response *Updat
 		Labels:         "",
 	}
 
-	resp, err := pod.UpdatePod(nil, requestPCM)
+	resp, err := server.UpdatePod(nil, requestPCM)
 
 	response = &UpdateContainerGroupResponse{
 		BaseResponse: nil,

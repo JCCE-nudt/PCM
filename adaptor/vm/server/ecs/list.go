@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/JCCE-nudt/PCM/adaptor/vm_adaptor/service/ecser"
+	"github.com/JCCE-nudt/PCM/adaptor/vm/service/ecser"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbecs"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"

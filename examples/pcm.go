@@ -1,45 +1,10 @@
 package main
 
 import (
-	"flag"
-	pcm_pod_ali "github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod/ali"
-	pcm_service "github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/service"
-	"github.com/JCCE-nudt/PCM/common/tenanter"
+	pcm_pod_ali "github.com/JCCE-nudt/PCM/adaptor/pod/server/ali"
 	"github.com/alibabacloud-go/tea/tea"
-	"github.com/golang/glog"
-	"github.com/pkg/errors"
-
 	"os"
 )
-
-/**
- * 使用AK&SK初始化账号Client
- * @param accessKeyId
- * @param accessKeySecret
- * @return Client
- * @throws Exception
- */
-func CreateClient() (pod pcm_service.Poder, _err error) {
-	var configFile string
-	flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
-	flag.Parse()
-	defer glog.Flush()
-
-	if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
-		if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
-			glog.Fatalf("LoadCloudConfigsFromFile error %+v", err)
-		}
-		glog.Warningf("LoadCloudConfigsFromFile empty file path %s", configFile)
-	}
-
-	glog.Infof("load tenant from file finished")
-	tenanters, _ := tenanter.GetTenanters(0)
-	region, _ := tenanter.NewRegion(0, 6)
-
-	pod, _ = pcm_service.NewPodClient(0, region, tenanters[0])
-
-	return
-}
 
 func _main(args []*string) (_err error) {
 

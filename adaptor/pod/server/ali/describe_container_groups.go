@@ -1,7 +1,7 @@
 package ali
 
 import (
-	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
+	"github.com/JCCE-nudt/PCM/adaptor/pod/server"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbpod"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
@@ -21,7 +21,7 @@ func DescribeContainerGroups(request *DescribeContainerGroupsRequest) (response 
 		Namespace:     "pcm",
 	}
 
-	resp, err := pod.ListPod(nil, requestPCM)
+	resp, err := server.ListPod(nil, requestPCM)
 
 	//trans PCM response pod set to Ali ContainerGroup set
 	for k := range resp.Pods {

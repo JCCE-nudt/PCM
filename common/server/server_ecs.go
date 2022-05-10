@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/JCCE-nudt/PCM/adaptor/vm_adaptor/server/ecs"
+	"github.com/JCCE-nudt/PCM/adaptor/vm/server/ecs"
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbecs"
 
 	"github.com/golang/glog"
