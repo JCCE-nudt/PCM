@@ -1,6 +1,7 @@
 package ali
 
 import (
+	"errors"
 	"flag"
 	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
@@ -8,6 +9,7 @@ import (
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/responses"
+	"github.com/golang/glog"
 )
 
 // CreateContainerGroup invokes the eci.CreateContainerGroup API synchronously
@@ -18,7 +20,16 @@ func CreateContainerGroup(request *CreateContainerGroupRequest) (response *Creat
 	var configFile string
 	flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
 	flag.Parse()
-	tenanter.LoadCloudConfigsFromFile(configFile)
+	defer glog.Flush()
+
+	if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
+		if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
+			glog.Fatalf("tenanter.LoadCloudConfigsFromFile error %+v", err)
+		}
+		glog.Warningf("tenanter.LoadCloudConfigsFromFile empty file path %s", configFile)
+	}
+
+	glog.Infof("load tenant from file finished")
 	tenanters, err := tenanter.GetTenanters(provider)
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	container := *request.Container

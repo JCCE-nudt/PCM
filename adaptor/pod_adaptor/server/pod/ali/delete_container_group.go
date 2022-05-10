@@ -16,6 +16,7 @@
 package ali
 
 import (
+	"errors"
 	"flag"
 	"github.com/JCCE-nudt/PCM/adaptor/pod_adaptor/server/pod"
 	"github.com/JCCE-nudt/PCM/common/tenanter"
@@ -23,6 +24,7 @@ import (
 	"github.com/JCCE-nudt/PCM/lan_trans/idl/pbtenant"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/responses"
+	"github.com/golang/glog"
 )
 
 // DeleteContainerGroup invokes the eci.DeleteContainerGroup API synchronously
@@ -33,7 +35,16 @@ func DeleteContainerGroup(request *DeleteContainerGroupRequest) (response *Delet
 	var configFile string
 	flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
 	flag.Parse()
-	tenanter.LoadCloudConfigsFromFile(configFile)
+	defer glog.Flush()
+
+	if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
+		if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
+			glog.Fatalf("tenanter.LoadCloudConfigsFromFile error %+v", err)
+		}
+		glog.Warningf("tenanter.LoadCloudConfigsFromFile empty file path %s", configFile)
+	}
+
+	glog.Infof("load tenant from file finished")
 	regionId, err := tenanter.GetAliRegionId(request.RegionId)
 	podId := request.ContainerGroupId
 	podName := request.ContainerGroupName
