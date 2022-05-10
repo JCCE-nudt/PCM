@@ -31,7 +31,17 @@ func CreateContainerGroup(request *CreateContainerGroupRequest) (response *Creat
 
 	glog.Infof("load tenant from file finished")
 	tenanters, err := tenanter.GetTenanters(provider)
-	regionId, err := tenanter.GetAliRegionId(request.RegionId)
+	var regionId int32
+	switch request.ProviderId {
+	case 0:
+		regionId, _ = tenanter.GetAliRegionId(request.RegionId)
+	case 1:
+		regionId, _ = tenanter.GetTencentRegionId(request.RegionId)
+	case 2:
+		regionId, _ = tenanter.GetHuaweiRegionId(request.RegionId)
+	case 3:
+		regionId, _ = tenanter.GetK8SRegionId(request.RegionId)
+	}
 	container := *request.Container
 	containerImage := container[0].Image
 	containerName := container[0].Name

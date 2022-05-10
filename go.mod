@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/alibabacloud-go/darabonba-openapi v0.1.4
 	github.com/alibabacloud-go/darabonba-string v1.0.0
+	github.com/alibabacloud-go/eci-20180808/v2 v2.0.2
 	github.com/alibabacloud-go/ecs-20140526/v2 v2.1.0
 	github.com/alibabacloud-go/tea v1.1.15
 	github.com/alibabacloud-go/tea-utils v1.3.9

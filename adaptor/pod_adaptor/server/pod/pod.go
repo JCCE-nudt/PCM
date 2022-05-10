@@ -99,22 +99,7 @@ func CreatePod(ctx context.Context, req *pbpod.CreatePodReq) (*pbpod.CreatePodRe
 	var (
 		pod poder.Poder
 	)
-	//pcm adk过来的请求需要从用户本地读取配置文件
-	if len(req.RequestSource) > 0 {
-		var configFile string
-		flag.StringVar(&configFile, "conf", "configs/config.yaml", "config.yaml")
-		flag.Parse()
-		defer glog.Flush()
 
-		if err := tenanter.LoadCloudConfigsFromFile(configFile); err != nil {
-			if !errors.Is(err, tenanter.ErrLoadTenanterFileEmpty) {
-				glog.Fatalf("tenanter.LoadCloudConfigsFromFile error %+v", err)
-			}
-			glog.Warningf("tenanter.LoadCloudConfigsFromFile empty file path %s", configFile)
-		}
-
-		glog.Infof("load tenant from file finished")
-	}
 	tenanters, err := tenanter.GetTenanters(req.Provider)
 	if err != nil {
 		return nil, errors.WithMessage(err, "getTenanters error")

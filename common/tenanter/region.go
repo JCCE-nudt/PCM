@@ -159,12 +159,7 @@ func GetK8SRegionName(regionId int32) (string, error) {
 
 // GetK8SRegionId prefix ali_
 func GetK8SRegionId(regionName string) (int32, error) {
-	regionName = "ali_" + strings.ReplaceAll(regionName, "-", "_")
-	id, ok := pbtenant.AliRegionId_value[regionName]
-	if !ok || regionName == "" {
-		return 0, errors.WithMessagef(ErrNoExistAliRegionId, "input region id is %s", regionName)
-	}
-	return id, nil
+	return 0, nil
 }
 
 // GetAwsRegionName prefix aws_
